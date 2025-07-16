@@ -21,7 +21,7 @@ const CompanionCards = async ({
   color,
 }: CompanionCardProps) => {
   const CourseAccess = await CoursePermission(id);
-  const user = await auth();
+  const { userId } = await auth();
   return (
     <article className="companion-card h-[350px]" style={{ background: color }}>
       <div className="flex justify-between items-center">
@@ -36,7 +36,7 @@ const CompanionCards = async ({
         <Image width={13.5} height={13.5} src="/icons/clock.svg" alt="" />
         <p className="textsm">{duration} hour</p>
       </div>
-      {user.isAuthenticated ? (
+      {userId ? (
         CourseAccess ? (
           <Link href={`/companions/${id}`} className="w-full">
             <button className="btn-primary w-full justify-center">
