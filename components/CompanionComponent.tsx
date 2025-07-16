@@ -1,5 +1,5 @@
 "use client";
-import { cn, configureAssistant, getSubjectColor } from "@/lib/utils";
+import { cn, configureAssistant } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
@@ -24,6 +24,7 @@ const CompanionComponent = ({
   title,
   topic,
   duration,
+  color,
   userName,
 }: CompanionComponentProps) => {
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -97,10 +98,7 @@ const CompanionComponent = ({
     <section className="flex flex-col h-[70vh]">
       <section className="flex gap-8 max-sm:flex-col">
         <div className="companion-section">
-          <div
-            className="companion-avatar"
-            style={{ backgroundColor: getSubjectColor(subject.trim()) }}
-          >
+          <div className="companion-avatar" style={{ backgroundColor: color }}>
             <div
               className={cn(
                 "absolute transition-opacity duration-1000",
@@ -113,11 +111,11 @@ const CompanionComponent = ({
               )}
             >
               <Image
-                src={`/icons/${subject}.svg`}
+                src={`/icons/robot.jpg`}
                 alt={subject}
                 width={150}
                 height={150}
-                className="max-sm:w-fit"
+                className="max-sm:w-12 max-sm:h-12 max-sm:block sm:w-[150px] sm:h-[150px]"
               />
             </div>
             <div
@@ -134,7 +132,7 @@ const CompanionComponent = ({
               />
             </div>
           </div>
-          <p className="font-bold text-2xl">{name}</p>
+          <p className="font-bold text-2xl max-sm:hidden">{name}</p>
         </div>
         <div className="user-section">
           <div className="user-avatar">

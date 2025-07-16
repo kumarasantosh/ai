@@ -2,7 +2,6 @@ import CompanionForm from "@/components/CompanionForm";
 import { Button } from "@/components/ui/button";
 import { newCampanionPermission } from "@/lib/action/companion.action";
 import { auth } from "@clerk/nextjs/server";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

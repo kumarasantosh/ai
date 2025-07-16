@@ -1,8 +1,7 @@
 import CompanionComponent from "@/components/CompanionComponent";
-import { getCompanion } from "@/lib/action/companion.action";
-import { getSubjectColor } from "@/lib/utils";
+import { CoursePermission, getCompanion } from "@/lib/action/companion.action";
 import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface CompanionSessionPageProps {
@@ -12,12 +11,21 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
   const { id } = await params;
   const companion = await getCompanion(id);
   const user = await currentUser();
+  const courseAccess = await CoursePermission(id);
   const { name, subject, title, topic, duration } = companion;
   if (!user) {
     return <div>Please sign in to view this page.</div>;
   }
   if (!companion) {
-    return <div>Companion not found.</div>;
+    return <div className="font-bold">Companion not found.</div>;
+  }
+  if (!courseAccess) {
+    return (
+      <main>
+        <h1>You Dont have Access to this course</h1>
+        <Link href="/subscription">Please upgrade your plan</Link>
+      </main>
+    );
   }
   return (
     <main>
@@ -26,16 +34,9 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
           <div
             className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"
             style={{
-              backgroundColor: getSubjectColor(companion.subject.trim()),
+              backgroundColor: companion.color,
             }}
-          >
-            <Image
-              width={32}
-              height={32}
-              src={`/icons/${companion.subject.trim()}.svg`}
-              alt=""
-            />
-          </div>
+          ></div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <p className="font-bold text-2xl">{companion.name}</p>
@@ -47,7 +48,7 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
           </div>
         </div>
         <div className="items-start text-2xl max-md:hidden">
-          {companion.duration} minutes
+          {companion.duration} {companion.duration > 10 ? "minutes" : "hour"}
         </div>
       </article>
       <CompanionComponent

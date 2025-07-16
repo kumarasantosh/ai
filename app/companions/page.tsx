@@ -1,7 +1,6 @@
 import CompanionCards from "@/components/CompanionCards";
 import Srch from "@/components/Srch";
 import { getallcompanions } from "@/lib/action/companion.action";
-import { getSubjectColor } from "@/lib/utils";
 import React from "react";
 
 const CompanionLibrary = async ({ searchParams }: SearchParams) => {
@@ -22,7 +21,7 @@ const CompanionLibrary = async ({ searchParams }: SearchParams) => {
           <CompanionCards
             key={companion.id}
             {...companion}
-            color={getSubjectColor(companion.subject.trim())}
+            color={companion.color}
           />
         ))}
       </section>

@@ -11,6 +11,16 @@ export const getSubjectColor = (subject: string) => {
   return subjectsColors[subject as keyof typeof subjectsColors];
 };
 
+export const generateRandomPastelColor = () => {
+  const r = Math.floor(Math.random() * 56) + 200;
+  const g = Math.floor(Math.random() * 56) + 200;
+  const b = Math.floor(Math.random() * 56) + 200;
+
+  return `#${r.toString(16).padStart(2, "0")}${g
+    .toString(16)
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+};
+
 export const configureAssistant = (voice: string, style: string) => {
   const voiceId =
     voices[voice as keyof typeof voices][
@@ -19,8 +29,7 @@ export const configureAssistant = (voice: string, style: string) => {
 
   const vapiAssistant: CreateAssistantDTO = {
     name: "Companion",
-    firstMessage:
-      "Hello, let's start the session. Today we'll be talking about {{topic}}.",
+    firstMessage: "Hello,let's start the session. ",
     transcriber: {
       provider: "deepgram",
       model: "nova-3",
@@ -37,7 +46,7 @@ export const configureAssistant = (voice: string, style: string) => {
     },
     model: {
       provider: "openai",
-      model: "gpt-4",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",

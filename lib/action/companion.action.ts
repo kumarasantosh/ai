@@ -125,3 +125,32 @@ export const newCampanionPermission = async () => {
     return false;
   }
 };
+export const CoursePermission = async (id) => {
+  const { has } = await auth();
+  const supabase = createSupabaseClient();
+
+  let CourseAccess =
+    has({ plan: "pro" }) ||
+    has({ plan: "core" }) ||
+    has({ feature: "ai_teaching_assistant" });
+  const { data } = await supabase
+    .from("companions")
+    .select("id", { count: "exact" })
+    .eq("id", id);
+  if (data[0].id === "b04a7e47-f41d-43e4-9c88-3ffe9d496e20") {
+    CourseAccess = true;
+  }
+
+  return CourseAccess;
+};
+
+export const UserPermisson = async () => {
+  const { has } = await auth();
+
+  const CourseAccess =
+    has({ plan: "pro" }) ||
+    has({ plan: "core" }) ||
+    has({ feature: "ai_teaching_assistant" });
+
+  return CourseAccess;
+};

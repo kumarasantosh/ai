@@ -23,6 +23,7 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { createCompanion } from "@/lib/action/companion.action";
 import { redirect } from "next/navigation";
+import { generateRandomPastelColor } from "@/lib/utils";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -59,7 +60,8 @@ const CompanionForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const companion = await createCompanion(values);
+    const companionData = { ...values, color: generateRandomPastelColor() };
+    const companion = await createCompanion(companionData);
     if (companion) {
       redirect(`/companions/${companion.id}`);
     } else {
@@ -69,9 +71,27 @@ const CompanionForm = () => {
 
   return (
     <div>
-      {" "}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField
+            control={form.control}
+            name="teacher_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Teacher Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter The Teacher Name"
+                    {...field}
+                    className="input"
+                    value={field.value || ""} // Ensure it's always a controlled value
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="name"
@@ -83,12 +103,14 @@ const CompanionForm = () => {
                     placeholder="Enter The Lesson Name"
                     {...field}
                     className="input"
+                    value={field.value || ""} // Ensure it's always a controlled value
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />{" "}
+          />
+
           <FormField
             control={form.control}
             name="subject"
@@ -100,29 +122,33 @@ const CompanionForm = () => {
                     placeholder="Enter The Sub Name"
                     {...field}
                     className="input"
+                    value={field.value || ""} // Ensure it's always a controlled value
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />{" "}
+          />
+
           <FormField
             control={form.control}
             name="topic"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Topic</FormLabel>
+                <FormLabel>Syllabus</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Enter The Topic Name"
+                    placeholder="Enter The Syllabus Name"
                     {...field}
                     className="input"
+                    value={field.value || ""} // Ensure it's always a controlled value
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          />{" "}
+          />
+
           <FormField
             control={form.control}
             name="voice"
@@ -132,8 +158,7 @@ const CompanionForm = () => {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
+                    value={field.value || ""} // Ensure it's always a controlled value
                   >
                     <SelectTrigger className="input capitalize">
                       <SelectValue placeholder="Select Voice" />
@@ -148,6 +173,7 @@ const CompanionForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="style"
@@ -157,8 +183,7 @@ const CompanionForm = () => {
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    value={field.value}
-                    defaultValue={field.value}
+                    value={field.value || ""} // Ensure it's always a controlled value
                   >
                     <SelectTrigger className="input capitalize">
                       <SelectValue placeholder="Select The Style" />
@@ -173,6 +198,7 @@ const CompanionForm = () => {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name="duration"
@@ -185,12 +211,14 @@ const CompanionForm = () => {
                     type="number"
                     {...field}
                     className="input"
+                    value={field.value || ""} // Ensure it's always a controlled value
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <Button type="submit" className="w-full cursor-pointer">
             Upload
           </Button>

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import Image from "next/image";
-import { cn, getSubjectColor } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 interface CompanionListProps {
   title: string;
   companions?: Companion[];
@@ -29,38 +29,35 @@ const CardList = ({ title, companions, className }: CompanionListProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {companions?.map((i) => (
-            <TableRow key={i.id}>
+          {companions?.map((i, index) => (
+            <TableRow key={index}>
               <TableCell className="font-medium">
                 <Link href={`/companions/${i.id}`}>
                   <div className="flex items-center gap-2">
                     <div
                       className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"
                       style={{
-                        backgroundColor: getSubjectColor(i.subject),
+                        backgroundColor: i.color,
                       }}
                     >
-                      <Image
-                        width={35}
-                        height={35}
-                        src={`/icons/${i.subject}.svg`}
-                        alt=""
-                      />
+                      <h4>{index + 1}</h4>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <p className="font-bold text-2xl">{i.name}</p>
-                      <p className="text-lg">{i.topic}</p>
+                      <p className="font-bold text-2xl">
+                        {`${i.name.substring(0, 20)}...`}
+                      </p>
+                      <p className="text-lg">{i.subject}</p>
                     </div>
                   </div>
                 </Link>
               </TableCell>
               <TableCell>
                 <div className="subject-badge w-fit max-md:hidden">
-                  {i.subject}
+                  {i.subject.split("/")[0]}
                 </div>
                 <div
                   className="flex items-center justify-content rounded-lg w-fit p-2 md:hidden"
-                  style={{ backgroundColor: getSubjectColor(i.subject) }}
+                  style={{ backgroundColor: i.color }}
                 >
                   <Image
                     width={18}
@@ -74,7 +71,9 @@ const CardList = ({ title, companions, className }: CompanionListProps) => {
                 <div className="flex items-center gap-2 w-full justify-end">
                   <p className="text-2xl">
                     {i.duration}
-                    <span className="max-md:hidden">mins</span>
+                    <span className="max-md:hidden">
+                      {i.duration > 10 ? "minutes" : "hours"}
+                    </span>
                   </p>
                   <Image
                     src="/icons/clock.svg"
