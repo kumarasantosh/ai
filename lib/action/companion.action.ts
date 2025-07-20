@@ -1,6 +1,6 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
-import { createSupabaseClient } from "../supabase";
+import { createSupabaseClient, createSupabaseServerClient } from "../supabase";
 
 export const createCompanion = async (formData: CreateCompanion) => {
   const { userId: author } = await auth();
@@ -28,6 +28,7 @@ export const getallcompanions = async ({
 
   let query = supabase.from("companions").select("*");
 
+  query = query.order("created_at", { ascending: false });
   if (subject && topic) {
     query = query.ilike("subject", `%${subject}%`).ilike("topic", `%${topic}%`);
   } else if (subject) {
@@ -63,7 +64,7 @@ export const getCompanion = async (id: string) => {
 };
 export const addToSessionHistory = async (companionId: string) => {
   const { userId } = await auth();
-  const supabase = createSupabaseClient();
+  const supabase = createSupabaseServerClient();
   const { data, error } = await supabase.from("session_history").insert({
     companion_id: companionId,
     user_id: userId,
@@ -125,32 +126,69 @@ export const newCampanionPermission = async () => {
     return false;
   }
 };
-export const CoursePermission = async (id) => {
-  const { has } = await auth();
-  const supabase = createSupabaseClient();
+export const CoursePermission = async (id: string): Promise<boolean> => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
 
-  let CourseAccess =
-    has({ plan: "pro" }) ||
-    has({ plan: "core" }) ||
-    has({ feature: "ai_teaching_assistant" });
-  const { data } = await supabase
+  if (!userId) return false;
+
+  const { data: companionData, error: companionError } = await supabase
     .from("companions")
-    .select("id", { count: "exact" })
-    .eq("id", id);
-  if (data[0].id === "b04a7e47-f41d-43e4-9c88-3ffe9d496e20") {
-    CourseAccess = true;
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (companionError || !companionData) {
+    console.log("Error fetching companion:", companionError);
+    return false;
   }
 
-  return CourseAccess;
+  if (companionData.is_free) return true;
+
+  // 2. Otherwise, check if the user purchased it
+  const { data: purchaseData, error: purchaseError } = await supabase
+    .from("purchases")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("companion_id", id)
+    .maybeSingle();
+  if (!purchaseData) {
+    return false;
+  }
+  const expiry = purchaseData.access_expires_at
+    ? new Date(purchaseData.access_expires_at)
+    : null;
+
+  if (expiry && expiry < purchaseData.purchased_at) {
+    console.log("Purchase expired on", expiry.toISOString());
+    return false;
+  }
+
+  if (purchaseError || !purchaseData) {
+    console.log("No purchase found or error:", purchaseError);
+    return false;
+  }
+
+  return true;
 };
 
-export const UserPermisson = async () => {
-  const { has } = await auth();
+export const getRecentPurchase = async () => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
 
-  const CourseAccess =
-    has({ plan: "pro" }) ||
-    has({ plan: "core" }) ||
-    has({ feature: "ai_teaching_assistant" });
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
 
-  return CourseAccess;
+  const { data, error } = await supabase
+    .from("purchases")
+    .select("*, companion:companion_id(*)") // full purchase row + joined companion
+    .eq("user_id", userId)
+    .order("purchased_at", { ascending: false });
+
+  if (error) {
+    throw new Error(`Supabase Error: ${error.message}`);
+  }
+
+  return data; // full purchase row, with companion embedded
 };

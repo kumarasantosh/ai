@@ -14,8 +14,8 @@ const navitems = [
     href: "/companions",
   },
   {
-    label: "Subscriptions",
-    href: "/subscription",
+    label: "Orders",
+    href: "/orders",
   },
 ];
 const Navitems = () => {

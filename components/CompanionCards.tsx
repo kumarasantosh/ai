@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { CoursePermission } from "@/lib/action/companion.action";
 import { auth } from "@clerk/nextjs/server";
+import ClientPaymentWrapper from "./PaymentWrap";
 
 interface CompanionCardProps {
   id: string;
@@ -11,6 +12,7 @@ interface CompanionCardProps {
   subject: string;
   duration: number;
   color: string;
+  price: number;
 }
 const CompanionCards = async ({
   id,
@@ -19,6 +21,7 @@ const CompanionCards = async ({
   subject,
   duration,
   color,
+  price,
 }: CompanionCardProps) => {
   const CourseAccess = await CoursePermission(id);
   const { userId } = await auth();
@@ -44,11 +47,7 @@ const CompanionCards = async ({
             </button>
           </Link>
         ) : (
-          <Link href="/subscription" className="w-full">
-            <button className="btn-primary w-full justify-center">
-              Upgrade Your Plan
-            </button>
-          </Link>
+          <ClientPaymentWrapper id={id} price={price} courseName={name} />
         )
       ) : (
         <Link href="/sign-in" className="w-full">

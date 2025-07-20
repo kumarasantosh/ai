@@ -1,4 +1,6 @@
 import { Bricolage_Grotesque } from "next/font/google";
+import Script from "next/script";
+
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
@@ -23,6 +25,10 @@ export default function RootLayout({
     <ClerkProvider appearance={{ variables: { colorPrimary: "#fe5933" } }}>
       <html lang="en">
         <body className={`${bricolage.variable} antialiased`}>
+          <Script
+            src="https://checkout.razorpay.com/v1/checkout.js"
+            strategy="beforeInteractive"
+          />
           <Navbar />
           {children}
         </body>
