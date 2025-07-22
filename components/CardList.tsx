@@ -32,7 +32,7 @@ const CardList = ({ title, companions, className }: CompanionListProps) => {
           {companions?.map((i, index) => (
             <TableRow key={index}>
               <TableCell className="font-medium">
-                <Link href={`/companions/${i.id}`}>
+                <Link href={`/companions/details/${i.id}`}>
                   <div className="flex items-center gap-2">
                     <div
                       className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"

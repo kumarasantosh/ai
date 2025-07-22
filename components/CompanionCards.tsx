@@ -41,13 +41,17 @@ const CompanionCards = async ({
       </div>
       {userId ? (
         CourseAccess ? (
-          <Link href={`/companions/${id}`} className="w-full">
+          <Link href={`/companions/details/${id}`} className="w-full">
             <button className="btn-primary w-full justify-center">
               Launch Lesson
             </button>
           </Link>
         ) : (
-          <ClientPaymentWrapper id={id} price={price} courseName={name} />
+          <Link href={`/companions/details/${id}`} className="w-full">
+            <button className="btn-primary w-full justify-center">
+              View Course
+            </button>
+          </Link>
         )
       ) : (
         <Link href="/sign-in" className="w-full">

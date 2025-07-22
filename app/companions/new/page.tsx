@@ -2,7 +2,6 @@ import CompanionForm from "@/components/CompanionForm";
 import { Button } from "@/components/ui/button";
 import { newCampanionPermission } from "@/lib/action/companion.action";
 import { auth } from "@clerk/nextjs/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import React from "react";
@@ -21,9 +20,7 @@ const New = async () => {
       ) : (
         <article className="companion-limit">
           <h1>Upgrade Your Plan</h1>
-          <Button>
-            <Link href="/subscription">Upgrade Now</Link>
-          </Button>
+          <Button></Button>
         </article>
       )}
     </main>

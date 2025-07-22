@@ -21,7 +21,12 @@ export const generateRandomPastelColor = () => {
     .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 };
 
-export const configureAssistant = (voice: string, style: string) => {
+export const configureAssistant = (
+  voice: string,
+  style: string,
+  unit: [{ title: string; content: string }],
+  topic: string
+) => {
   const voiceId =
     voices[voice as keyof typeof voices][
       style as keyof (typeof voices)[keyof typeof voices]
@@ -29,7 +34,7 @@ export const configureAssistant = (voice: string, style: string) => {
 
   const vapiAssistant: CreateAssistantDTO = {
     name: "Companion",
-    firstMessage: "Hello,let's start the session. ",
+    firstMessage: `Hello! Let's start the session on "${unit[0].title}". Here's what you'll learn: ${unit[0].content}`,
     transcriber: {
       provider: "deepgram",
       model: "nova-3",

@@ -1,16 +1,37 @@
 import CompanionComponent from "@/components/CompanionComponent";
-import { CoursePermission, getCompanion } from "@/lib/action/companion.action";
+import {
+  CoursePermission,
+  getCompanion,
+  getSectionsByCompanionId,
+  getUnit,
+  getUnitsBySectionId,
+} from "@/lib/action/companion.action";
 import { currentUser } from "@clerk/nextjs/server";
 
 interface CompanionSessionPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; sid: string }>;
 }
-const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
-  const { id } = await params;
+const SessionCompanionWithUnits = async ({
+  params,
+}: CompanionSessionPageProps) => {
+  const { id, sid } = await params;
   const companion = await getCompanion(id);
+  const sections = await getSectionsByCompanionId(id);
+  const units = await Promise.all(
+    sections.map(async (section) => {
+      const unitsForSection = await getUnitsBySectionId(section.id);
+      return {
+        ...section,
+        units: unitsForSection,
+      };
+    })
+  );
+  const currUnit = await getUnit(sid);
+
   const user = await currentUser();
   const courseAccess = await CoursePermission(id);
   const { name, subject, title, topic, duration } = companion;
+  console.log(units);
   if (!user) {
     return <div>Please sign in to view this page.</div>;
   }
@@ -41,7 +62,7 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
                 {companion.subject}
               </div>
             </div>
-            <p className="text-lg text-[#808080]">{companion.topic}</p>
+            <p className="text-lg text-[#808080]">{currUnit[0].title}</p>
           </div>
         </div>
         <div className="items-start text-2xl max-md:hidden">
@@ -50,6 +71,9 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
       </article>
       <CompanionComponent
         {...companion}
+        unit={currUnit}
+        companion={companion}
+        sections={units}
         companionId={id}
         userName={user.firstName!}
         userImage={user.imageUrl!}
@@ -58,4 +82,4 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
   );
 };
 
-export default SessionCompanion;
+export default SessionCompanionWithUnits;

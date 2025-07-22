@@ -81,4 +81,19 @@ interface CompanionComponentProps {
   style: string;
   color: string;
   userpermission: boolean;
+  name: string;
+  subject: string;
+  companionId: string;
+  userImage: string;
+  style: string;
+  voice: string;
+  title: string;
+  content: string;
+  topic: string;
+  duration?: string;
+  color: string;
+  userName: string;
+  id: string;
+  section_id: string;
+  prompt: string | null;
 }

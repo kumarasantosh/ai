@@ -1,0 +1,285 @@
+"use client";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useFieldArray } from "react-hook-form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { generateRandomPastelColor } from "@/lib/utils";
+import { createCompanion } from "@/lib/action/companion.action";
+import { redirect } from "next/navigation";
+
+const formSchema = z.object({
+  name: z.string().min(1),
+  subject: z.string().min(1),
+  topic: z.string().min(1),
+  voice: z.string().min(1),
+  style: z.string().min(1),
+  duration: z.coerce.number().min(1),
+  sections: z.array(
+    z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      units: z.array(
+        z.object({
+          title: z.string().min(1),
+        })
+      ),
+    })
+  ),
+});
+
+export default function CompanionForm() {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      subject: "",
+      topic: "",
+      voice: "",
+      style: "",
+      duration: 15,
+      sections: [],
+    },
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = form;
+
+  const {
+    fields: sectionFields,
+    append: appendSection,
+    remove: removeSection,
+  } = useFieldArray({
+    control,
+    name: "sections",
+  });
+
+  const onSubmit = async (values) => {
+    const data = { ...values, color: generateRandomPastelColor() };
+    const companion = await createCompanion(data);
+    if (companion) redirect(`/companions/${companion.id}`);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          name="name"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lesson Name</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="subject"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Subject</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="topic"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Topic</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="voice"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Voice</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Voice" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="style"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Style</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="formal">Formal</SelectItem>
+                    <SelectItem value="informal">Informal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="duration"
+          control={control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Duration</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Section + Unit Handling */}
+        {sectionFields.map((section, sectionIndex) => (
+          <div key={section.id} className="border p-4 rounded-md space-y-4">
+            <FormField
+              name={`sections.${sectionIndex}.title`}
+              control={control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Section Title</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`sections.${sectionIndex}.description`}
+              control={control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Section Description</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <UnitField sectionIndex={sectionIndex} control={control} />
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => removeSection(sectionIndex)}
+            >
+              Remove Section
+            </Button>
+          </div>
+        ))}
+
+        <Button
+          type="button"
+          onClick={() =>
+            appendSection({
+              title: "",
+              description: "",
+              units: [{ title: "" }],
+            })
+          }
+        >
+          Add Section
+        </Button>
+
+        <Button type="submit" className="w-full">
+          Submit
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+function UnitField({ sectionIndex, control }) {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `sections.${sectionIndex}.units`,
+  });
+
+  return (
+    <div className="space-y-2">
+      <h4 className="font-medium">Units</h4>
+      {fields.map((unit, unitIndex) => (
+        <div key={unit.id} className="flex gap-2 items-center">
+          <FormField
+            control={control}
+            name={`sections.${sectionIndex}.units.${unitIndex}.title`}
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormControl>
+                  <Input placeholder="Unit Title" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => remove(unitIndex)}
+          >
+            Remove
+          </Button>
+        </div>
+      ))}
+      <Button type="button" onClick={() => append({ title: "" })}>
+        Add Unit
+      </Button>
+    </div>
+  );
+}
