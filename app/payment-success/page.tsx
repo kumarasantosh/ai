@@ -42,7 +42,7 @@ const page = async ({ searchParams }: Props) => {
         </div>
 
         <Link
-          href={`/companions/${companion_id}`}
+          href={`/companions/${companion_id}/details`}
           className="mt-6 inline-block bg-green-600 text-white text-sm font-semibold py-3 px-6 rounded-lg hover:bg-green-700 transition-all"
         >
           Start Learning

@@ -56,7 +56,8 @@ export const createCourseWithSectionsAndUnits = async (
     const units = section.units?.map((unit) => ({
       section_id: sectionId,
       title: unit.title,
-      content: unit.description,
+      content: unit.content,
+      prompt: unit.prompt,
     }));
 
     if (units && units.length > 0) {
