@@ -6,11 +6,11 @@ import {
   getUnitsBySectionId,
 } from "@/lib/action/companion.action";
 
-interface CopanionDetailsProps {
+interface CompanionDetailsProps {
   params: { id: string };
 }
 
-export default async function Page({ params }: CopanionDetailsProps) {
+export default async function Page({ params }: CompanionDetailsProps) {
   const { id } = await params;
   const companion = await getCompanion(id);
   const sections = await getSectionsByCompanionId(id);
