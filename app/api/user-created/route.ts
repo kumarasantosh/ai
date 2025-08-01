@@ -4,23 +4,22 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body: WebhookEvent = await req.json();
+    console.log("📥 Webhook received:", JSON.stringify(body, null, 2));
 
-    // We only handle user.created event
     if (body.type !== "user.created") {
       return NextResponse.json({ message: "Ignored non-user.created event" });
     }
 
     const userId = body.data.id;
+    console.log("👤 Getting user:", userId);
 
-    // 🔍 Fetch full user data from Clerk
     const user = await clerkClient.users.getUser(userId);
+    console.log("✅ Got user:", user);
 
-    // 📧 Get the email safely
     const email = user.emailAddresses?.[0]?.emailAddress || "";
     const firstName = user.firstName || "";
     const lastName = user.lastName || "";
 
-    // 📝 Update metadata
     await clerkClient.users.updateUserMetadata(userId, {
       publicMetadata: {
         role: "user",
@@ -34,9 +33,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "User metadata updated" });
   } catch (error) {
     console.error("❌ Webhook handler error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
