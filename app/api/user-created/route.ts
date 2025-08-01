@@ -1,6 +1,6 @@
 // app/api/user-created/route.ts
-import { WebhookEvent } from "@clerk/nextjs/server";
-import { clerkClient } from "@clerk/nextjs/server";
+
+import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,14 +8,17 @@ export async function POST(req: Request) {
     const body: WebhookEvent = await req.json();
 
     if (body.type !== "user.created") {
-      return NextResponse.json({ message: "Not a user.created event" });
+      return NextResponse.json({ message: "Ignored non-user.created event" });
     }
 
-    const { id: userId, email_addresses } = body.data;
+    const userId = body.data.id;
 
-    const email = email_addresses?.[0]?.email_address || "";
+    // 🔍 Fetch full user data to get email
+    const user = await clerkClient.users.getUser(userId);
 
-    // ✅ Example: set public metadata
+    const email = user.emailAddresses?.[0]?.emailAddress || "";
+
+    // ✅ Update public metadata
     await clerkClient.users.updateUserMetadata(userId, {
       publicMetadata: {
         role: "user",
@@ -24,9 +27,13 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: "Metadata updated" });
+    console.log(`✅ Updated metadata for ${userId}`);
+    return NextResponse.json({ message: "User metadata updated" });
   } catch (error) {
-    console.error("Webhook error:", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    console.error("❌ Webhook error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
