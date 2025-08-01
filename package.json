@@ -6,11 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "npm install --legacy-peer-deps"
+    "lint": "next lint"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^5.1.6",
+    "@clerk/express": "^1.7.15",
     "@clerk/nextjs": "^6.28.1",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.1.1",
