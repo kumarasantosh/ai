@@ -1,13 +1,16 @@
 import CompanionForm from "@/components/CompanionForm";
 import { Button } from "@/components/ui/button";
 import { newCampanionPermission } from "@/lib/action/companion.action";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import React from "react";
 
 const New = async () => {
   const { userId } = await auth();
+  const user = await currentUser();
+
+  if (user?.publicMetadata?.role !== "admin") redirect("/");
   if (!userId) redirect("/sign-in");
   const canCreateCompanion = await newCampanionPermission();
   return (

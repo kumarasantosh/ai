@@ -7,6 +7,7 @@ import {
 } from "@/lib/action/companion.action";
 
 import React, { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 
 interface SummaryProps {
   params: Promise<{ id: string; sid: string }>;
@@ -15,12 +16,15 @@ interface SummaryProps {
 export default function ContentGenerator({ params }: SummaryProps) {
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(true);
+  const [customPrompt, setCustomPrompt] = useState("");
   const [paramData, setParamData] = useState<{
     id: string;
     sid: string;
   } | null>(null);
 
-  // Resolve params when component mounts
+  const { user } = useUser();
+  const role = user?.publicMetadata?.role;
+
   useEffect(() => {
     const resolveParams = async () => {
       const resolvedParams = await params;
@@ -29,30 +33,23 @@ export default function ContentGenerator({ params }: SummaryProps) {
     resolveParams();
   }, [params]);
 
-  // Check if unit summary has meaningful content
   const hasValidSummary = (summaryContent: any): boolean => {
     if (!summaryContent) return false;
-
-    // Handle string content
     if (typeof summaryContent === "string") {
       return (
         summaryContent.trim().length > 10 &&
         summaryContent.trim() !== "No summary available"
       );
     }
-
-    // Handle object content with summary property
     if (typeof summaryContent === "object" && summaryContent.summary) {
       return (
         summaryContent.summary.trim().length > 10 &&
         summaryContent.summary.trim() !== "No summary available"
       );
     }
-
     return false;
   };
 
-  // Generate summary using AI
   const generateSummary = async (title: string, prompt: string) => {
     const response = await fetch("/api/generate", {
       method: "POST",
@@ -72,7 +69,6 @@ export default function ContentGenerator({ params }: SummaryProps) {
     return data.content;
   };
 
-  // Load unit data and handle summary
   useEffect(() => {
     const loadSummary = async () => {
       if (!paramData) return;
@@ -80,14 +76,9 @@ export default function ContentGenerator({ params }: SummaryProps) {
       try {
         const { id: companionId, sid: unitId } = paramData;
 
-        // 1. Get existing summary first
         const [existingSummary] = await getUnitSummary(unitId);
-        console.log("Existing summary:", existingSummary); // Debug log
-
-        // 2. Check if summary exists and extract the text
         if (hasValidSummary(existingSummary)) {
           let summaryText;
-
           if (typeof existingSummary === "string") {
             summaryText = existingSummary;
           } else if (existingSummary && existingSummary.summary) {
@@ -100,15 +91,11 @@ export default function ContentGenerator({ params }: SummaryProps) {
           return;
         }
 
-        // 3. No valid summary exists, get unit data to generate one
         const [{ title, prompt }] = await getUnit(unitId);
-        console.log("Unit data for generation:", { title, prompt }); // Debug log
 
-        // 4. Generate new summary only if no existing summary
         const generatedSummary = await generateSummary(title, prompt);
         setSummary(generatedSummary);
 
-        // 5. Save generated summary to database
         await upsertUnitSummary({
           companionId,
           unitId,
@@ -139,19 +126,60 @@ export default function ContentGenerator({ params }: SummaryProps) {
       </div>
     );
   }
+
   function cleanHtmlResponse(rawResponse: string): string {
-    // Remove leading ```html or ```
     const withoutLeadingFence = rawResponse.replace(/^```html\s*|^```\s*/i, "");
-
-    // Remove trailing ``` (only if it's on its own line or at the end)
     const cleaned = withoutLeadingFence.replace(/```$/, "").trim();
-
     return cleaned;
   }
+
   const html = cleanHtmlResponse(summary);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {role === "admin" && (
+        <div className="mb-6">
+          <label className="block mb-2 font-semibold">
+            Custom Prompt (Admin Only):
+          </label>
+          <textarea
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md mb-2"
+            rows={4}
+            placeholder="Enter a custom prompt to regenerate the summary..."
+          />
+          <button
+            onClick={async () => {
+              if (!paramData || customPrompt.trim() === "") return;
+              setLoading(true);
+              try {
+                const { id: companionId, sid: unitId } = paramData;
+                const [{ title }] = await getUnit(unitId);
+                const generated = await generateSummary(title, customPrompt);
+                setSummary(generated);
+
+                await upsertUnitSummary({
+                  companionId,
+                  unitId,
+                  summaryContent: generated,
+                  unitTitle: title,
+                  originalContent: customPrompt,
+                });
+              } catch (error) {
+                console.error("Regeneration error:", error);
+                setSummary("Failed to regenerate summary.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Generate with Custom Prompt
+          </button>
+        </div>
+      )}
+
       <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );

@@ -137,7 +137,8 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
   // Enhanced configuration constants for better short word detection
   const WEBSOCKET_URL =
     process.env.NEXT_PUBLIC_VOCODE_WS_URL ||
-    "ws://13.60.19.253:3000/conversation";
+    "ws://16.171.31.174:3000/conversation" ||
+    "wss://study.justsantosh.site/conversation";
   const VOICE_THRESHOLD = 0.06; // Reduced from 0.08 for better sensitivity
   const SILENCE_TIMEOUT = 600; // Reduced from 1000ms for faster detection
   const MAX_RETRY_ATTEMPTS = 3;
@@ -167,7 +168,7 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
           process.env.NEXT_PUBLIC_VOCODE_WS_URL?.replace(
             "ws://",
             "http://"
-          ).replace("/conversation", "") || "http://13.60.19.253:3000";
+          ).replace("/conversation", "") || "http://16.171.31.174:3000";
 
         const response = await fetch(`${baseUrl}/voices`);
         if (response.ok) {

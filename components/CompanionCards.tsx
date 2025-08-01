@@ -2,8 +2,9 @@ import Image from "next/image";
 import React from "react";
 import Link from "next/link";
 import { CoursePermission } from "@/lib/action/companion.action";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import ClientPaymentWrapper from "./PaymentWrap";
+import MoreOptionsMenu from "./MoreOptionsMenu";
 
 interface CompanionCardProps {
   id: string;
@@ -25,13 +26,13 @@ const CompanionCards = async ({
 }: CompanionCardProps) => {
   const CourseAccess = await CoursePermission(id);
   const { userId } = await auth();
+  const user = await currentUser();
+  const role = user?.publicMetadata?.role;
   return (
     <article className="companion-card h-[350px]" style={{ background: color }}>
       <div className="flex justify-between items-center">
         <div className="subject-badge">{subject.split("/")[0]}</div>
-        <button className="companion-bookmark">
-          <Image width={12.5} height={15} src="/icons/bookmarks.svg" alt="" />
-        </button>
+        <MoreOptionsMenu courseId={id} courseName={name} role={role} />
       </div>
       <h2 className="text-2xl font-bold">{name}</h2>
       <p className="line-clamp-5 text-sm">{topic}</p>

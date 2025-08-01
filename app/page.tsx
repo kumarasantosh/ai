@@ -5,11 +5,15 @@ import {
   getallcompanions,
   getRecentSessions,
 } from "@/lib/action/companion.action";
+import { currentUser } from "@clerk/nextjs/server";
+
 import React from "react";
 
 const Page = async () => {
   const companions = await getallcompanions({ limit: 3 });
   const resentSessionCompanion = await getRecentSessions();
+  const user = await currentUser();
+  const role = user?.publicMetadata?.role;
   return (
     <main>
       <h1 className="text-2xl underline">Popular Companions</h1>
@@ -28,7 +32,7 @@ const Page = async () => {
           companions={resentSessionCompanion}
           className="w-2/3 max-lg:w-full"
         />
-        <CTA />
+        {role === "admin" ? <CTA /> : ""}
       </section>
     </main>
   );

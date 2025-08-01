@@ -1,5 +1,5 @@
 "use server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { createSupabaseClient, createSupabaseServerClient } from "../supabase";
 import { courseFormSchema } from "../schema";
 import { z } from "zod";
@@ -13,7 +13,7 @@ export const createCourseWithSectionsAndUnits = async (
   // 1. Create the course
   const { data: courseData, error: courseError } = await supabase
     .from("companions")
-    .insert({
+    .upsert({
       name: formData.name,
       subject: formData.subject,
       topic: formData.topic,
@@ -38,7 +38,7 @@ export const createCourseWithSectionsAndUnits = async (
   for (const section of formData.sections ?? []) {
     const { data: sectionData, error: sectionError } = await supabase
       .from("sections")
-      .insert({
+      .upsert({
         title: section.title,
         description: section.description,
         companion_id: courseId,
@@ -61,7 +61,7 @@ export const createCourseWithSectionsAndUnits = async (
     }));
 
     if (units && units.length > 0) {
-      const { error: unitError } = await supabase.from("units").insert(units);
+      const { error: unitError } = await supabase.from("units").upsert(units);
       if (unitError) {
         throw new Error("Error creating units: " + unitError.message);
       }
@@ -264,21 +264,24 @@ export const createUnitSummary = async (summaryData) => {
   return data;
 };
 
-export const updateUnitSummary = async (unitId, summaryContent) => {
+export const updateUnitSummary = async (
+  unitId: string,
+  summaryContent: string
+) => {
   const supabase = createSupabaseServerClient();
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
 
-  if (!userId) {
-    throw new Error("User not authenticated");
+  if (!userId || sessionClaims?.metadata?.role !== "admin") {
+    throw new Error("Unauthorized: Only admins can update summaries");
   }
 
   const { data, error } = await supabase
     .from("unit_summary")
     .update({
       summary: summaryContent,
+      updated_at: new Date().toISOString(), // Optional: timestamp update
     })
     .eq("unit_id", unitId)
-    .eq("user_id", userId)
     .select()
     .single();
 
@@ -300,11 +303,16 @@ export const upsertUnitSummary = async (summaryData) => {
 
   const { data, error } = await supabase
     .from("unit_summary")
-    .upsert({
-      unit_id: summaryData.unitId,
-      summary: summaryData.summaryContent,
-      original: summaryData.originalContent,
-    })
+    .upsert(
+      {
+        unit_id: summaryData.unitId,
+        summary: summaryData.summaryContent,
+        original: summaryData.originalContent,
+      },
+      {
+        onConflict: "unit_id",
+      }
+    )
     .select()
     .single();
 
@@ -335,7 +343,170 @@ export const getRecentPurchase = async () => {
 
   return data; // full purchase row, with companion embedded
 };
+export const updateCourseWithSectionsAndUnits = async (
+  formData: z.infer<typeof courseFormSchema>
+) => {
+  const supabase = createSupabaseServerClient();
 
+  if (!formData.id) throw new Error("Missing course ID for update");
+
+  // 1. Update course
+  const { error: courseError } = await supabase
+    .from("companions")
+    .update({
+      name: formData.name,
+      subject: formData.subject,
+      topic: formData.topic,
+      style: formData.style,
+      voice: formData.voice,
+      duration: formData.duration,
+      teacher: formData.teacher,
+      author: formData.author,
+      price: formData.price,
+    })
+    .eq("id", formData.id);
+
+  if (courseError) {
+    throw new Error("Error updating course: " + courseError.message);
+  }
+
+  // 2. Get existing sections and units to compare
+  const { data: existingSections, error: fetchError } = await supabase
+    .from("sections")
+    .select(
+      `
+      id,
+      units (id)
+    `
+    )
+    .eq("companion_id", formData.id);
+
+  if (fetchError) {
+    throw new Error("Error fetching existing sections: " + fetchError.message);
+  }
+
+  // Track which sections and units should be kept
+  const keptSectionIds = new Set<string>();
+  const keptUnitIds = new Set<string>();
+
+  // 3. Update or insert each section
+  for (const section of formData.sections ?? []) {
+    let sectionId = section.id;
+
+    if (sectionId) {
+      // Update existing section
+      keptSectionIds.add(sectionId);
+
+      const { error: sectionError } = await supabase
+        .from("sections")
+        .update({
+          title: section.title,
+          description: section.description,
+        })
+        .eq("id", sectionId);
+
+      if (sectionError)
+        throw new Error("Error updating section: " + sectionError.message);
+    } else {
+      // Insert new section
+      const { data: sectionData, error: sectionError } = await supabase
+        .from("sections")
+        .insert({
+          title: section.title,
+          description: section.description,
+          companion_id: formData.id,
+        })
+        .select()
+        .single();
+
+      if (sectionError || !sectionData)
+        throw new Error("Error inserting section");
+
+      sectionId = sectionData.id;
+      keptSectionIds.add(sectionId);
+    }
+
+    // 4. Update or insert units for this section
+    for (const unit of section.units ?? []) {
+      if (unit.id) {
+        // Update existing unit
+        keptUnitIds.add(unit.id);
+
+        const { error: unitError } = await supabase
+          .from("units")
+          .update({
+            title: unit.title,
+            content: unit.content,
+            prompt: unit.prompt,
+          })
+          .eq("id", unit.id);
+
+        if (unitError)
+          throw new Error("Error updating unit: " + unitError.message);
+      } else {
+        // Insert new unit
+        const { data: unitData, error: unitError } = await supabase
+          .from("units")
+          .insert({
+            section_id: sectionId,
+            title: unit.title,
+            content: unit.content,
+            prompt: unit.prompt,
+          })
+          .select()
+          .single();
+
+        if (unitError || !unitData)
+          throw new Error("Error inserting unit: " + unitError.message);
+
+        keptUnitIds.add(unitData.id);
+      }
+    }
+  }
+
+  // 5. Delete units that are no longer in the form
+  const allExistingUnitIds =
+    existingSections?.flatMap(
+      (section) => section.units?.map((unit) => unit.id) || []
+    ) || [];
+
+  const unitIdsToDelete = allExistingUnitIds.filter(
+    (id) => !keptUnitIds.has(id)
+  );
+
+  if (unitIdsToDelete.length > 0) {
+    const { error: deleteUnitsError } = await supabase
+      .from("units")
+      .delete()
+      .in("id", unitIdsToDelete);
+
+    if (deleteUnitsError) {
+      throw new Error("Error deleting units: " + deleteUnitsError.message);
+    }
+  }
+
+  // 6. Delete sections that are no longer in the form
+  const existingSectionIds =
+    existingSections?.map((section) => section.id) || [];
+  const sectionIdsToDelete = existingSectionIds.filter(
+    (id) => !keptSectionIds.has(id)
+  );
+
+  if (sectionIdsToDelete.length > 0) {
+    const { error: deleteSectionsError } = await supabase
+      .from("sections")
+      .delete()
+      .in("id", sectionIdsToDelete);
+
+    if (deleteSectionsError) {
+      throw new Error(
+        "Error deleting sections: " + deleteSectionsError.message
+      );
+    }
+  }
+
+  return { success: true };
+};
 export const getUnit = async (id: string) => {
   const supabase = createSupabaseServerClient();
 
@@ -374,4 +545,27 @@ export const getUnitSummary = async (unitId: string) => {
   }
 
   return data;
+};
+export const deleteCompanion = async (companionId: string) => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
+  const user = await currentUser();
+
+  if (user?.publicMetadata?.role !== "admin") {
+    throw new Error("Not Authorized");
+  }
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const { error } = await supabase
+    .from("companions")
+    .delete()
+    .eq("id", companionId);
+
+  if (error) {
+    throw new Error(`Failed to delete companion: ${error.message}`);
+  }
+
+  return { success: true };
 };
