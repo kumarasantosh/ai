@@ -17,6 +17,7 @@ import {
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -1444,28 +1445,40 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
                     {openSectionId === section.id && (
                       <ul className="bg-white divide-y divide-gray-200">
                         {section.units.map((unitItem) => (
-                          <Link
+                          <div
+                            className={cn(
+                              "flex items-center justify-between rounded-md transition-colors px-4",
+                              unitItem.id === normalizedUnit.id
+                                ? "bg-blue-50 border-l-4 border-blue-500"
+                                : "hover:bg-gray-50"
+                            )}
                             key={unitItem.id}
-                            href={`/companions/${companionId}/${unitItem.id}`}
                           >
-                            <li
-                              className={cn(
-                                "flex items-center gap-2 px-6 py-3 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer",
-                                unitItem.id === normalizedUnit.id &&
-                                  "bg-blue-50 border-l-4 border-blue-500"
-                              )}
+                            {/* Main Unit Row Link */}
+                            <Link
+                              key={unitItem.id}
+                              href={`/companions/${companionId}/${unitItem.id}`}
+                              className="flex items-center gap-2 px-6 py-3 flex-1 text-gray-700"
                             >
                               <BookOpen size={16} className="text-purple-500" />
-                              <span className="text-sm flex-1">
+                              <span className="text-sm flex-1 truncate">
                                 {unitItem.title}
                               </span>
                               {unitItem.id === normalizedUnit.id && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full whitespace-nowrap">
                                   Current
                                 </span>
                               )}
-                            </li>
-                          </Link>
+                            </Link>
+
+                            {/* Summary Button - aligned right */}
+                            <Link
+                              href={`/companions/summary/${companionId}/${unitItem.id}`}
+                              className="text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md transition inline-block ml-2"
+                            >
+                              Summary
+                            </Link>
+                          </div>
                         ))}
                       </ul>
                     )}

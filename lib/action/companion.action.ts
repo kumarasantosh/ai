@@ -218,6 +218,103 @@ export const getSectionsByCompanionId = async (companionId: string) => {
   return data;
 };
 
+// Get existing summaries
+export const getUnitSummaries = async () => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("unit_summary")
+    .select("*, companion:companion_id(*)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(`Supabase Error: ${error.message}`);
+  }
+
+  return data;
+};
+
+export const createUnitSummary = async (summaryData) => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("unit_summary")
+    .insert({
+      unit_id: summaryData.unitId,
+      summary: summaryData.summaryContent,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to create summary: ${error.message}`);
+  }
+
+  return data;
+};
+
+export const updateUnitSummary = async (unitId, summaryContent) => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("unit_summary")
+    .update({
+      summary: summaryContent,
+    })
+    .eq("unit_id", unitId)
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to update summary: ${error.message}`);
+  }
+
+  return data;
+};
+
+// Upsert (insert or update) unit summary
+export const upsertUnitSummary = async (summaryData) => {
+  const supabase = createSupabaseServerClient();
+  const { userId } = await auth();
+
+  if (!userId) {
+    throw new Error("User not authenticated");
+  }
+
+  const { data, error } = await supabase
+    .from("unit_summary")
+    .upsert({
+      unit_id: summaryData.unitId,
+      summary: summaryData.summaryContent,
+      original: summaryData.originalContent,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to save summary: ${error.message}`);
+  }
+
+  return data;
+};
+
 export const getRecentPurchase = async () => {
   const supabase = createSupabaseServerClient();
   const { userId } = await auth();
@@ -258,6 +355,20 @@ export const getUnitsBySectionId = async (sectionId: string) => {
     .from("units")
     .select("*")
     .eq("section_id", sectionId);
+  if (error) {
+    throw new Error(`Error fetching units: ${error.message}`);
+  }
+
+  return data;
+};
+
+export const getUnitSummary = async (unitId: string) => {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("unit_summary")
+    .select("*")
+    .eq("unit_id", unitId);
   if (error) {
     throw new Error(`Error fetching units: ${error.message}`);
   }
