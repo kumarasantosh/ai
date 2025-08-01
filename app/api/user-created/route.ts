@@ -1,20 +1,20 @@
-import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
+import { clerkClient, WebhookEvent } from "@clerk/clerk-sdk-node";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const body: WebhookEvent = await req.json();
-    console.log("📥 Webhook received:", JSON.stringify(body, null, 2));
+    console.log("📨 Webhook event received:", JSON.stringify(body, null, 2));
 
     if (body.type !== "user.created") {
       return NextResponse.json({ message: "Ignored non-user.created event" });
     }
 
     const userId = body.data.id;
-    console.log("👤 Getting user:", userId);
+    console.log("🔍 Fetching user with ID:", userId);
 
     const user = await clerkClient.users.getUser(userId);
-    console.log("✅ Got user:", user);
+    console.log("✅ User data fetched:", JSON.stringify(user, null, 2));
 
     const email = user.emailAddresses?.[0]?.emailAddress || "";
     const firstName = user.firstName || "";
@@ -29,10 +29,13 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log(`✅ Updated metadata for ${userId}`);
+    console.log(`🎉 Metadata updated for user: ${userId}`);
     return NextResponse.json({ message: "User metadata updated" });
-  } catch (error) {
-    console.error("❌ Webhook handler error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("❌ Webhook handler error:", error?.message || error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error?.message },
+      { status: 500 }
+    );
   }
 }
