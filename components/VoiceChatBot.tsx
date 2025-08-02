@@ -19,7 +19,7 @@ const VoiceChatBot = () => {
 
   // Configuration
   const [serverUrl, setServerUrl] = useState(
-    "ws://16.171.31.174:3000/conversation"
+    "wss://ws.justsantosh.site/conversation"
   );
   const [silenceTimeout, setSilenceTimeout] = useState(1000);
   const [sensitivity, setSensitivity] = useState(0.06); // 6% - above background noise

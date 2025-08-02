@@ -163,10 +163,8 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
     const fetchVoices = async () => {
       try {
         const baseUrl =
-          process.env.NEXT_PUBLIC_VOCODE_WS_URL?.replace(
-            "ws://",
-            "http://"
-          ).replace("/conversation", "") || "http://16.171.31.174:3000";
+          process.env.NEXT_PUBLIC_VOCODE_WS_URL ||
+          "wss://ws.justsantosh.site/conversation";
 
         // const response = await fetch(`${baseUrl}/voices`);
         const response = await fetch("/api/voices");
