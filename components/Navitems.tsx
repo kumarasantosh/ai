@@ -17,6 +17,10 @@ const navitems = [
     label: "Orders",
     href: "/orders",
   },
+  {
+    label: "Recent Sessions",
+    href: "/history",
+  },
 ];
 const Navitems = () => {
   const pathname = usePathname();

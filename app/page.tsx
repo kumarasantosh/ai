@@ -11,12 +11,12 @@ import React from "react";
 
 const Page = async () => {
   const companions = await getallcompanions({ limit: 3 });
-  const resentSessionCompanion = await getRecentSessions();
+  const Allcompanions = await getallcompanions({ limit: 30 });
   const user = await currentUser();
   const role = user?.publicMetadata?.role;
   return (
     <main>
-      <h1 className="text-2xl underline">Popular Companions</h1>
+      <h1 className="text-2xl underline">Suggested For You</h1>
       <section className="home-section">
         {companions.map((companion) => (
           <CompanionCards
@@ -26,12 +26,15 @@ const Page = async () => {
           /> //
         ))}
       </section>
+      <h1>Trending Courses</h1>
       <section className="home-section">
-        <CardList
-          title="Recently Completed Sessions"
-          companions={resentSessionCompanion}
-          className="w-2/3 max-lg:w-full"
-        />
+        {companions.map((companion) => (
+          <CompanionCards
+            key={companion.id}
+            {...companion}
+            color={companion.color}
+          /> //
+        ))}
         {role === "admin" ? <CTA /> : ""}
       </section>
     </main>
