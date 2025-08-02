@@ -156,14 +156,21 @@ export const getUserSession = async (userId: string) => {
 };
 
 export const newCampanionPermission = async () => {
-  return true;
+  const user = await currentUser();
+  if (user?.publicMetadata?.role === "admin") {
+    return true;
+  }
+  return false;
 };
 export const CoursePermission = async (id: string): Promise<boolean> => {
   const supabase = createSupabaseServerClient();
   const { userId } = await auth();
+  const user = await currentUser();
 
+  if (user?.publicMetadata?.role === "admin") {
+    return true;
+  }
   if (!userId) return false;
-
   const { data: companionData, error: companionError } = await supabase
     .from("companions")
     .select("*")
