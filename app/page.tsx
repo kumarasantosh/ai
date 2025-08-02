@@ -27,7 +27,7 @@ const Page = async () => {
         ))}
       </section>
       <h1>Trending Courses</h1>
-      <section className="home-section w-full max-w-7xl mx-auto px-6 py-8">
+      <section className="home-section w-full max-w-7xl items-center mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Companions Grid */}
           <div className="flex-1 min-w-0">

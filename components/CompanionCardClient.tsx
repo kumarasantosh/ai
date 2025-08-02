@@ -37,7 +37,7 @@ const CompanionCardClient = ({
 
   return (
     <article
-      className={`relative w-80 h-96 rounded-2xl overflow-hidden shadow-xl transition-all duration-500 transform ${
+      className={`relative w-90 h-96 rounded-2xl overflow-hidden shadow-xl transition-all duration-500 transform ${
         isHovered ? "scale-105 shadow-2xl" : ""
       }`}
       style={{ background: color }}
