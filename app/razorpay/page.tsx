@@ -45,7 +45,7 @@ const PaymentPage = () => {
     }
   };
   return (
-    <main>
+    <main className="bg-dark-space text-gray-300">
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray">
         <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         <div className="p-6 bg-white rounded-lg shadow-md">

@@ -35,7 +35,7 @@ export default function RootLayout({
       }}
     >
       <html lang="en">
-        <body className={`${bricolage.variable} antialiased`}>
+        <body className={`${bricolage.variable} antialiased `}>
           <Script
             src="https://checkout.razorpay.com/v1/checkout.js"
             strategy="beforeInteractive"

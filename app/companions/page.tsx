@@ -9,7 +9,7 @@ const CompanionLibrary = async ({ searchParams }: SearchParams) => {
   const topic = filters.topic;
   const companions = await getallcompanions({ subject, topic });
   return (
-    <main>
+    <main className="bg-dark-space text-gray-300 flex items-center">
       <section className="flex justify-between gap-4 max-sm:flex-col">
         <h1>All Courses</h1>
         <div className="flex gap-4">

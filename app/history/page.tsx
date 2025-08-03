@@ -6,7 +6,7 @@ const page = async () => {
   const resentSessionCompanion = await getRecentSessions();
   console.log(resentSessionCompanion);
   return (
-    <main>
+    <main className="bg-dark-space text-gray-300">
       <section className="home-section">
         {resentSessionCompanion ? (
           <CardList

@@ -19,26 +19,30 @@ const Subscription = async () => {
   const recentPurchase = await getRecentPurchase();
 
   return (
-    <main className="flex flex-col min-h-screen p-6">
+    <main className="flex bg-dark-space text-gray-300 flex-col min-h-screen p-6 ">
       <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
 
       {recentPurchase?.length > 0 ? (
-        <Table>
+        <Table className="text-white">
           <TableCaption>A list of your recent purchases.</TableCaption>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Order ID</TableHead>
-              <TableHead>Companion</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Purchased At</TableHead>
-              <TableHead className="text-right">Access Expires</TableHead>
+            <TableRow className="text-gray-300">
+              <TableHead className="w-[100px] text-gray-300">
+                Order ID
+              </TableHead>
+              <TableHead className="text-gray-300">Companion</TableHead>
+              <TableHead className="text-gray-300">Price</TableHead>
+              <TableHead className="text-gray-300">Purchased At</TableHead>
+              <TableHead className="text-right text-gray-300">
+                Access Expires
+              </TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
             {recentPurchase.map((purchase) => (
               <TableRow key={purchase.id ?? purchase.purchaseId}>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-white">
                   {purchase.id ?? purchase.purchaseId}
                 </TableCell>
                 <TableCell>{purchase.companion?.name || "N/A"}</TableCell>

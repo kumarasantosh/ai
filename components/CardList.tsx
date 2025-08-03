@@ -18,14 +18,20 @@ interface CompanionListProps {
 }
 const CardList = ({ title, companions, className }: CompanionListProps) => {
   return (
-    <article className={cn("companion-list", className)}>
-      <h2 className="text-3xl font-semibold">Recent Sessions</h2>
+    <article
+      className={cn("companion-list bg-dark-space text-gray-300", className)}
+    >
+      <h2 className="text-3xl font-semibold text-gray-300">Recent Sessions</h2>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-lg w-2/3">Lesson</TableHead>
-            <TableHead className="text-lg">Status</TableHead>
-            <TableHead className="text-lg text-right">Method</TableHead>
+            <TableHead className="text-lg w-2/3 text-gray-300">
+              Lesson
+            </TableHead>
+            <TableHead className="text-lg text-gray-300">Sub</TableHead>
+            <TableHead className="text-lg text-right text-gray-300">
+              Duration
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -35,7 +41,7 @@ const CardList = ({ title, companions, className }: CompanionListProps) => {
                 <Link href={`/companions/details/${i.id}`}>
                   <div className="flex items-center gap-2">
                     <div
-                      className="size-[72px] flex items-center justify-center rounded-lg max-md:hidden"
+                      className="size-[72px] flex items-center text-black  justify-center rounded-lg max-md:hidden"
                       style={{
                         backgroundColor: i.color,
                       }}

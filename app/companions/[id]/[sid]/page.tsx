@@ -48,6 +48,62 @@ const SessionCompanionWithUnits = () => {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
+  // Modified body background handling - more targeted approach
+  useEffect(() => {
+    const body = document.body;
+    const html = document.documentElement;
+
+    // Store original styles
+    const originalBodyBackground = body.style.background;
+    const originalBodyBackgroundColor = body.style.backgroundColor;
+    const originalBodyBackgroundImage = body.style.backgroundImage;
+
+    // Add a class to body instead of directly manipulating styles
+    body.classList.add("session-page");
+
+    // Create a style element for this specific page
+    const styleElement = document.createElement("style");
+    styleElement.id = "session-page-styles";
+    styleElement.textContent = `
+      body.session-page {
+        background: none !important;
+        background-color: transparent !important;
+        background-image: none !important;
+      }
+      
+      /* Ensure navigation text remains visible */
+      body.session-page nav,
+      body.session-page header,
+      body.session-page h1,
+      body.session-page .nav-text {
+        color: black !important;
+      }
+      
+      /* If you have specific navigation selectors, add them here */
+      body.session-page [data-nav="true"],
+      body.session-page .navigation,
+      body.session-page .navbar {
+        color: var(--text-primary, #000) !important;
+      }
+    `;
+
+    document.head.appendChild(styleElement);
+
+    // Cleanup function
+    return () => {
+      body.classList.remove("session-page");
+      const styleEl = document.getElementById("session-page-styles");
+      if (styleEl) {
+        styleEl.remove();
+      }
+
+      // Restore original styles
+      body.style.background = originalBodyBackground;
+      body.style.backgroundColor = originalBodyBackgroundColor;
+      body.style.backgroundImage = originalBodyBackgroundImage;
+    };
+  }, []);
+
   // Memoize params to prevent unnecessary re-renders
   const { id, sid } = useMemo(
     () => ({
@@ -169,7 +225,7 @@ const SessionCompanionWithUnits = () => {
   const { companion, units, currUnit } = data;
 
   return (
-    <main>
+    <main className="session-companion-page">
       {/* Header - render immediately */}
       <article className="flex rounded-border justify-between p-6 max-md:flex-col">
         <div className="flex items-center gap-2">
@@ -181,17 +237,19 @@ const SessionCompanionWithUnits = () => {
           ></div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <h1 className="font-bold text-2xl">{companion.name}</h1>
+              <h1 className="font-bold text-2xl text-gray-900 dark:text-gray-100">
+                {companion.name}
+              </h1>
               <div className="subject-badge max-sm:hidden">
                 {companion.subject}
               </div>
             </div>
-            <p className="text-lg text-[#808080]">
+            <p className="text-lg text-gray-600 dark:text-gray-400">
               {Array.isArray(currUnit) ? currUnit[0]?.title : currUnit?.title}
             </p>
           </div>
         </div>
-        <div className="items-start text-2xl max-md:hidden">
+        <div className="items-start text-2xl max-md:hidden text-gray-700 dark:text-gray-300">
           {companion.duration} {companion.duration > 10 ? "minutes" : "hour"}
         </div>
       </article>

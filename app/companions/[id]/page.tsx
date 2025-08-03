@@ -19,13 +19,13 @@ const SessionCompanion = async ({ params }: CompanionSessionPageProps) => {
   }
   if (!courseAccess) {
     return (
-      <main>
+      <main className="bg-dark-space text-gray-300">
         <h1>You Dont have Access to this course</h1>
       </main>
     );
   }
   return (
-    <main>
+    <main className="bg-dark-space text-gray-300">
       <article className="flex rounded-border justify-between p-6 max-md:fkex-col">
         <div className="flex items-center gap-2">
           <div

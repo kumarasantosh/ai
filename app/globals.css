@@ -87,6 +87,22 @@
 
 body {
   font-family: var(--font-bricolage);
+  background: linear-gradient(
+    135deg,
+    #0a0e1a 0%,
+    #1a1a2e 25%,
+    #16213e 50%,
+    #0a0e1a 100%
+  );
+}
+.bg-dark-space {
+  background: linear-gradient(
+    135deg,
+    #0a0e1a 0%,
+    #1a1a2e 25%,
+    #16213e 50%,
+    #0a0e1a 100%
+  );
 }
 
 .dark {
