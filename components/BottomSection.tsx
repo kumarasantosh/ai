@@ -99,7 +99,7 @@ const SimpleFooter = () => {
               </li>
               <li>
                 <Link
-                  href="/privacy"
+                  href="/privacy-policies"
                   className="hover:text-blue-400 transition-colors"
                 >
                   Privacy Policy
@@ -107,7 +107,7 @@ const SimpleFooter = () => {
               </li>
               <li>
                 <Link
-                  href="/refund-policy"
+                  href="/privacy-policies"
                   className="hover:text-blue-400 transition-colors"
                 >
                   Refund Policy
@@ -142,13 +142,7 @@ const SimpleFooter = () => {
         <div className="border-t border-gray-800 pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <div className="text-sm text-gray-400 mb-2 sm:mb-0">
-              © {currentYear} CompanionAI. All rights reserved.
-            </div>
-            <div className="flex items-center space-x-4 text-sm">
-              <span className="text-gray-400">Secured by</span>
-              <div className="bg-blue-600 px-2 py-1 rounded text-xs font-medium">
-                Razorpay
-              </div>
+              © {currentYear} Study. All rights reserved.
             </div>
           </div>
         </div>
