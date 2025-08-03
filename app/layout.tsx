@@ -12,8 +12,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Study - Learn and Grow",
-  description: "Your learning platform powered by Next.js and Clerk",
+  title: "JustSantosh",
+  description: "An AI Study Website",
 };
 
 export default function RootLayout({

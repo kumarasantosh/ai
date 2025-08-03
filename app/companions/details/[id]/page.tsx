@@ -1,5 +1,6 @@
 import CoursePage from "@/components/CoursePage";
 import CoursePageWrapper from "@/components/CoursePagePay";
+import PageStyleManager from "@/components/PageStyle";
 import {
   getCompanion,
   getSectionsByCompanionId,
@@ -24,5 +25,10 @@ export default async function Page({ params }: CompanionDetailsProps) {
     })
   );
 
-  return <CoursePageWrapper companion={companion} sections={units} />;
+  return (
+    <>
+      <PageStyleManager />
+      <CoursePageWrapper companion={companion} sections={units} />;
+    </>
+  );
 }
