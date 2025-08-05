@@ -58,26 +58,10 @@ const SimpleFooter = () => {
               </li>
               <li>
                 <Link
-                  href="/"
+                  href="/history"
                   className="hover:text-blue-400 transition-colors"
                 >
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/"
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/help"
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  Help Center
+                  Recent
                 </Link>
               </li>
             </ul>
@@ -95,14 +79,6 @@ const SimpleFooter = () => {
                   className="hover:text-blue-400 transition-colors"
                 >
                   Terms & Conditions
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacy-policies"
-                  className="hover:text-blue-400 transition-colors"
-                >
-                  Privacy Policy
                 </Link>
               </li>
               <li>
@@ -132,7 +108,7 @@ const SimpleFooter = () => {
 
         {/* Company Info */}
         <div className="text-center mb-6">
-          <h3 className="text-lg font-bold text-white mb-2">CompanionAI</h3>
+          <h3 className="text-lg font-bold text-white mb-2">StudyAI</h3>
           <p className="text-gray-400 text-sm">
             AI-powered learning companions for personalized education.
           </p>
