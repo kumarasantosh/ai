@@ -13,7 +13,7 @@ import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "JustSantosh",
-  description: "An AI Study Website",
+  description: "A Ai Study website",
 };
 
 export default function RootLayout({
