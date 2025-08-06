@@ -1,4 +1,5 @@
 // app/update/page.tsx
+import PageStyleManager from "@/components/PageStyle";
 import UpdateForm from "@/components/Updateform";
 import {
   getCompanion,
@@ -55,7 +56,12 @@ const Page = async ({ searchParams }: SearchParams) => {
     })),
   };
 
-  return <UpdateForm defaultValues={courseData} mode="update" />;
+  return (
+    <>
+      <PageStyleManager />
+      <UpdateForm defaultValues={courseData} mode="update" />
+    </>
+  );
 };
 
 export default Page;
