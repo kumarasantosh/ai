@@ -167,10 +167,15 @@ export const CoursePermission = async (id: string): Promise<boolean> => {
   const { userId } = await auth();
   const user = await currentUser();
 
-  if (user?.publicMetadata?.role === "admin") {
+  if (
+    user?.publicMetadata?.role === "admin" ||
+    user?.publicMetadata?.role === "all_courses"
+  ) {
     return true;
   }
+
   if (!userId) return false;
+
   const { data: companionData, error: companionError } = await supabase
     .from("companions")
     .select("*")
@@ -184,25 +189,25 @@ export const CoursePermission = async (id: string): Promise<boolean> => {
 
   if (companionData.is_free) return true;
 
-  // 2. Otherwise, check if the user purchased it
   const { data: purchaseData, error: purchaseError } = await supabase
     .from("purchases")
     .select("*")
     .eq("user_id", userId)
     .eq("companion_id", id)
     .maybeSingle();
-  if (!purchaseData) {
-    return false;
-  }
-  const expiry = purchaseData.access_expires_at
-    ? new Date(purchaseData.access_expires_at)
+
+  const expiry = user?.publicMetadata?.freetrailend
+    ? new Date(user?.publicMetadata?.freetrailend as string)
     : null;
 
-  if (expiry && expiry < purchaseData.purchased_at) {
+  if (expiry && expiry > new Date()) {
+    console.log(expiry.toISOString());
+    return true;
+  }
+  if (expiry && expiry < new Date()) {
     console.log("Purchase expired on", expiry.toISOString());
     return false;
   }
-
   if (purchaseError || !purchaseData) {
     console.log("No purchase found or error:", purchaseError);
     return false;
@@ -210,6 +215,7 @@ export const CoursePermission = async (id: string): Promise<boolean> => {
 
   return true;
 };
+
 export const getSectionsByCompanionId = async (companionId: string) => {
   const supabase = createSupabaseServerClient();
 

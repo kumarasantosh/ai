@@ -4,6 +4,7 @@ import CompanionCards from "@/components/CompanionCards";
 import CTA from "@/components/CTA";
 import {
   getallcompanions,
+  getRecentPurchase,
   getRecentSessions,
 } from "@/lib/action/companion.action";
 import { currentUser } from "@clerk/nextjs/server";
@@ -15,8 +16,15 @@ const Page = async () => {
   const Allcompanions = await getallcompanions({ limit: 30 });
   const user = await currentUser();
   const role = user?.publicMetadata?.role;
+  const recentPurchase = await getRecentPurchase();
+  const expiry = user?.publicMetadata?.freetrailend
+    ? new Date(user.publicMetadata.freetrailend as string)
+    : null;
+  let trail;
+  if (expiry && expiry < new Date()) {
+    trail = false;
+  }
 
-  console.log(user);
   return (
     <>
       <main className="bg-dark-space text-gray-300 pb-9">
@@ -25,10 +33,18 @@ const Page = async () => {
             <h1>Welcome {user?.fullName}, </h1>
             {role !== "admin" ? (
               <h2 className="pl-1 pt2 text-xl">
-                Your 7-Day Free Trial Ends soon! Keep exploring EducarftAI until{" "}
-                <span className="font-extrabold">
-                  {user?.publicMetadata?.freetrailend || "End Date"}
-                </span>
+                {recentPurchase.length === 0 && trail ? (
+                  "Please Subscribe for uninterrupted learnings"
+                ) : (
+                  <>
+                    Your 7-Day Free Trial Ends soon! Keep exploring EducarftAI
+                    until
+                    <span className="font-extrabold">
+                      {" "}
+                      {user?.publicMetadata?.freetrailend || "End Date"}
+                    </span>
+                  </>
+                )}
               </h2>
             ) : (
               ""
