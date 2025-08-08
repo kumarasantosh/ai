@@ -15,12 +15,22 @@ const Page = async () => {
   const Allcompanions = await getallcompanions({ limit: 30 });
   const user = await currentUser();
   const role = user?.publicMetadata?.role;
-
+  console.log(user);
   return (
     <>
       <main className="bg-dark-space text-gray-300 pb-9">
+        {user ? (
+          <div className="container mx-auto px-6">
+            <h1>Welcome {user?.fullName}, </h1>
+            <h2 className="pl-1 pt2 text-xl">
+              Your 7-Day Free Trial Ends soon! Keep exploring EducarftAI until{" "}
+              {user?.publicMetadata?.freetrailend || "End Date"}
+            </h2>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="container mx-auto px-6">
-          <h1 className="text-2xl underline mb-6">Suggested For You</h1>
           <section className="home-section mb-12">
             {companions.map((companion) => (
               <CompanionCards

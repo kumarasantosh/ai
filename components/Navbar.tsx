@@ -85,7 +85,7 @@ const Navbar = () => {
           <Link href="/">
             <div className="flex items-center cursor-pointer">
               <h1 className="text-2xl font-bold text-white tracking-wide">
-                Study
+                EduCraftAI
               </h1>
             </div>
           </Link>
@@ -169,7 +169,7 @@ const Navbar = () => {
 
             {/* Menu Content - Full Viewport */}
             <div
-              className="h-full w-full flex flex-col justify-center items-center px-6"
+              className="h-full w-full flex flex-col justify-center items-center px-6 bg-dark-space"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Navigation Items - Vertical Stack */}

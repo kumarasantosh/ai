@@ -33,7 +33,9 @@ const Navitems = () => {
         <Link
           href={href}
           key={label}
-          className={cn(pathname === href && "text-primary underline")}
+          className={cn(
+            pathname === href && "text-white underline font-extrabold "
+          )}
         >
           {label}
         </Link>

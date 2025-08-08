@@ -19,6 +19,9 @@ export async function POST(req: Request) {
     const email = user.emailAddresses?.[0]?.emailAddress || "";
     const firstName = user.firstName || "";
     const lastName = user.lastName || "";
+    const currentDate = new Date();
+    const futureDate = new Date(currentDate);
+    futureDate.setDate(futureDate.getDate() + 7);
 
     await clerkClient.users.updateUserMetadata(userId, {
       publicMetadata: {
@@ -26,6 +29,7 @@ export async function POST(req: Request) {
         email,
         name: `${firstName} ${lastName}`.trim(),
         joined: new Date().toISOString(),
+        freetrailend: futureDate.toISOString().split("T")[0],
       },
     });
 

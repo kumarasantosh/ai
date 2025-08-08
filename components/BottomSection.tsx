@@ -108,7 +108,7 @@ const SimpleFooter = () => {
 
         {/* Company Info */}
         <div className="text-center mb-6">
-          <h3 className="text-lg font-bold text-white mb-2">StudyAI</h3>
+          <h3 className="text-lg font-bold text-white mb-2">EduCraftAI</h3>
           <p className="text-gray-400 text-sm">
             AI-powered learning companions for personalized education.
           </p>
