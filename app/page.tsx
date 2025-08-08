@@ -15,6 +15,7 @@ const Page = async () => {
   const Allcompanions = await getallcompanions({ limit: 30 });
   const user = await currentUser();
   const role = user?.publicMetadata?.role;
+
   console.log(user);
   return (
     <>
@@ -22,10 +23,16 @@ const Page = async () => {
         {user ? (
           <div className="container mx-auto px-6">
             <h1>Welcome {user?.fullName}, </h1>
-            <h2 className="pl-1 pt2 text-xl">
-              Your 7-Day Free Trial Ends soon! Keep exploring EducarftAI until{" "}
-              {user?.publicMetadata?.freetrailend || "End Date"}
-            </h2>
+            {role !== "admin" ? (
+              <h2 className="pl-1 pt2 text-xl">
+                Your 7-Day Free Trial Ends soon! Keep exploring EducarftAI until{" "}
+                <span className="font-extrabold">
+                  {user?.publicMetadata?.freetrailend || "End Date"}
+                </span>
+              </h2>
+            ) : (
+              ""
+            )}
           </div>
         ) : (
           ""
