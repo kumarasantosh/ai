@@ -15,7 +15,7 @@ const Page = async () => {
   const companions = await getallcompanions({ limit: 3 });
   const Allcompanions = await getallcompanions({ limit: 30 });
   const user = await currentUser();
-  const role = user?.publicMetadata?.role;
+  const role = user?.publicMetadata?.role ?? null;
   const recentPurchase = await getRecentPurchase();
   const expiry = user?.publicMetadata?.freetrailend
     ? new Date(user.publicMetadata.freetrailend as string)
