@@ -24,7 +24,6 @@ export default async function Page({ params }: CompanionDetailsProps) {
       };
     })
   );
-
   return (
     <>
       <PageStyleManager />

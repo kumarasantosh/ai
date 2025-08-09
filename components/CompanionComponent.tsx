@@ -1115,7 +1115,7 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
         {/* Left Side - Companion Avatar and Controls */}
         <div className="flex flex-col flex-1 max-w-[50%] max-sm:max-w-none max-sm:min-w-0">
           {/* Avatar & Name */}
-          <div className="companion-section w-[90%] mb-6">
+          <div className="companion-section w-[90%] mb-6 max-sm:w-[100%]">
             <div
               className="companion-avatar relative"
               style={{ backgroundColor: color }}
@@ -1171,7 +1171,7 @@ const CompanionComponent: React.FC<CompanionComponentProps> = ({
           </div>
 
           {/* Controls */}
-          <div className="flex flex-row gap-2 justify-end mb-6 w-[90%] max-sm:flex-col">
+          <div className="flex flex-row gap-2 justify-end mb-6 w-[90%] max-sm:flex-col max-sm:w-[100%]">
             <button
               className={cn(
                 "btn-mic flex items-center gap-2 w-[50%] px-3 py-2 rounded-md text-sm justify-center max-sm:w-[100%] transition-colors",

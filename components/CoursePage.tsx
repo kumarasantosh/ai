@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import ClientPaymentWrapper from "./PaymentWrap";
 import Link from "next/link";
+import TestFeatureComingSoon from "./CommingSoon";
 
 type Unit = {
   id: string;
@@ -56,10 +57,8 @@ const CoursePage = ({ companion, sections, courseAccess }: Props) => {
       {/* Course Header */}
       <section className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 space-y-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">
-            {companion.title}
-          </h1>
-          <p className="text-lg text-gray-600">{companion.subject}</p>
+          <h1 className="text-xl font-bold text-gray-500">{companion.name}</h1>
+          <p className="text-lg text-gray-600">Subject: {companion.subject}</p>
           <p className="text-sm text-gray-500 mt-1">
             Instructor: {companion.name}
           </p>
@@ -163,6 +162,7 @@ const CoursePage = ({ companion, sections, courseAccess }: Props) => {
           ))}
         </div>
       </section>
+      <TestFeatureComingSoon />
     </main>
   );
 };
