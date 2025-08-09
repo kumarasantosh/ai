@@ -14,7 +14,12 @@ import React from "react";
 const Page = async () => {
   const companions = await getallcompanions({ limit: 3 });
   const Allcompanions = await getallcompanions({ limit: 30 });
-  const user = await currentUser();
+  let user;
+  try {
+    user = await currentUser();
+  } catch (err) {
+    console.warn("No authenticated user:", err);
+  }
   const role = user?.publicMetadata?.role ?? null;
   const recentPurchase = await getRecentPurchase();
   const expiry = user?.publicMetadata?.freetrailend
