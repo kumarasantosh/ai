@@ -40,7 +40,7 @@ const Page = async () => {
     : null;
   let trail = false;
   if (expiry && expiry < new Date()) {
-    trail = false;
+    trail = true;
   }
 
   return (
