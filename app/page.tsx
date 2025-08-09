@@ -10,7 +10,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import React from "react";
 
 const Page = async () => {
-  // Fetch companions safely
   let companions: any[] = [];
   let Allcompanions: any[] = [];
   try {
@@ -20,7 +19,6 @@ const Page = async () => {
     console.error("Error fetching companions:", err);
   }
 
-  // Fetch user safely
   let user = null;
   try {
     user = await currentUser();
@@ -30,7 +28,6 @@ const Page = async () => {
 
   const role = user?.publicMetadata?.role ?? null;
 
-  // Fetch purchases safely
   let recentPurchase: any[] = [];
   try {
     recentPurchase = (await getRecentPurchase()) ?? [];
@@ -38,11 +35,10 @@ const Page = async () => {
     console.error("Error fetching purchases:", err);
   }
 
-  // Trial expiry handling
   const expiry = user?.publicMetadata?.freetrailend
     ? new Date(String(user.publicMetadata.freetrailend))
     : null;
-  let trail = true;
+  let trail = false;
   if (expiry && expiry < new Date()) {
     trail = false;
   }
@@ -109,7 +105,6 @@ const Page = async () => {
                 </div>
               </div>
 
-              {/* CTA Sidebar */}
               {role === "admin" && (
                 <div className="w-full lg:w-72 lg:min-w-72 lg:max-w-72 lg:flex-shrink-0">
                   <div className="lg:sticky lg:top-24 h-fit">
