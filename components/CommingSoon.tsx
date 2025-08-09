@@ -19,7 +19,7 @@ const TestFeatureComingSoon = () => {
           <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-400/30 rounded-full px-4 py-2 mb-4">
             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
             <span className="text-blue-300 text-sm font-medium">
-              Test Feature
+              Knowledge Test Feature
             </span>
           </div>
 
@@ -30,9 +30,9 @@ const TestFeatureComingSoon = () => {
           </h1>
 
           <p className="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            We're putting the finishing touches on an exciting new test feature.
-            Get ready to experience enhanced functionality that will transform
-            your workflow.
+            We're putting the finishing touches on an exciting new knowledge
+            test feature. Get ready to experience enhanced functionality that
+            will transform your workflow.
           </p>
         </div>
 
