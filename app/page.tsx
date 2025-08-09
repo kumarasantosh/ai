@@ -5,27 +5,44 @@ import CTA from "@/components/CTA";
 import {
   getallcompanions,
   getRecentPurchase,
-  getRecentSessions,
 } from "@/lib/action/companion.action";
 import { currentUser } from "@clerk/nextjs/server";
-
 import React from "react";
 
 const Page = async () => {
-  const companions = await getallcompanions({ limit: 3 });
-  const Allcompanions = await getallcompanions({ limit: 30 });
-  let user;
+  // Fetch companions safely
+  let companions: any[] = [];
+  let Allcompanions: any[] = [];
+  try {
+    companions = (await getallcompanions({ limit: 3 })) ?? [];
+    Allcompanions = (await getallcompanions({ limit: 30 })) ?? [];
+  } catch (err) {
+    console.error("Error fetching companions:", err);
+  }
+
+  // Fetch user safely
+  let user = null;
   try {
     user = await currentUser();
   } catch (err) {
     console.warn("No authenticated user:", err);
   }
+
   const role = user?.publicMetadata?.role ?? null;
-  const recentPurchase = await getRecentPurchase();
+
+  // Fetch purchases safely
+  let recentPurchase: any[] = [];
+  try {
+    recentPurchase = (await getRecentPurchase()) ?? [];
+  } catch (err) {
+    console.error("Error fetching purchases:", err);
+  }
+
+  // Trial expiry handling
   const expiry = user?.publicMetadata?.freetrailend
-    ? new Date(user.publicMetadata.freetrailend as string)
+    ? new Date(String(user.publicMetadata.freetrailend))
     : null;
-  let trail;
+  let trail = true;
   if (expiry && expiry < new Date()) {
     trail = false;
   }
@@ -33,10 +50,10 @@ const Page = async () => {
   return (
     <>
       <main className="bg-dark-space text-gray-300 pb-9">
-        {user ? (
+        {user && (
           <div className="container mx-auto px-6">
             <h1>Welcome {user?.fullName}, </h1>
-            {role !== "admin" ? (
+            {role !== "admin" && (
               <h2 className="pl-1 pt2 text-xl">
                 {recentPurchase.length === 0 && trail ? (
                   "Please Subscribe for uninterrupted learnings"
@@ -51,14 +68,12 @@ const Page = async () => {
                   </>
                 )}
               </h2>
-            ) : (
-              ""
             )}
           </div>
-        ) : (
-          ""
         )}
+
         <div className="container mx-auto px-6">
+          {/* Featured companions */}
           <section className="home-section mb-12">
             {companions.map((companion) => (
               <CompanionCards
@@ -69,6 +84,7 @@ const Page = async () => {
             ))}
           </section>
 
+          {/* Trending */}
           <h1 className="text-2xl mb-8">Trending Courses</h1>
           <section className="w-full max-w-7xl mx-auto">
             <div className="flex flex-col lg:flex-row gap-8">
@@ -93,7 +109,7 @@ const Page = async () => {
                 </div>
               </div>
 
-              {/* CTA Sidebar - Compact size */}
+              {/* CTA Sidebar */}
               {role === "admin" && (
                 <div className="w-full lg:w-72 lg:min-w-72 lg:max-w-72 lg:flex-shrink-0">
                   <div className="lg:sticky lg:top-24 h-fit">
