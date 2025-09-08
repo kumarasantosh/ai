@@ -305,6 +305,21 @@ export const updateUnitSummary = async (
   return data;
 };
 
+export async function createBlog(title: string, content: string) {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("impq")
+    .insert([{ title, content }]);
+
+  if (error) {
+    console.error("Supabase error:", error);
+    throw error;
+  }
+
+  return data;
+}
+
 // Upsert (insert or update) unit summary
 export const upsertUnitSummary = async (summaryData) => {
   const supabase = createSupabaseServerClient();
@@ -582,3 +597,37 @@ export const deleteCompanion = async (companionId: string) => {
 
   return { success: true };
 };
+
+export async function getBlogs() {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("impq")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Supabase error:", error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Optional: Add function to get single blog
+export async function getBlog(id: number) {
+  const supabase = createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("impq")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error("Supabase error:", error);
+    throw error;
+  }
+
+  return data;
+}

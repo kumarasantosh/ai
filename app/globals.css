@@ -104,6 +104,19 @@ body {
     #0a0e1a 100%
   );
 }
+.prose ul {
+  list-style-type: disc !important;
+  margin-left: 1.5rem !important;
+}
+
+.prose ol {
+  list-style-type: decimal !important;
+  margin-left: 1.5rem !important;
+}
+
+.prose li {
+  display: list-item !important;
+}
 
 .dark {
   --background: oklch(0.145 0 0);
