@@ -224,7 +224,7 @@ export default function BlogCardsDisplay() {
                       {/* Floating Elements */}
                       <div className="absolute top-4 right-4">
                         <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm font-medium">
-                          #{blog.id}
+                          #{index + 1}
                         </div>
                       </div>
 
